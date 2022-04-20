@@ -54,8 +54,11 @@ def MyCuda_Stats():
     print('My Graphic Card is',torch.cuda.get_device_name(torch.cuda.current_device()))
     print('Is Cuda Available',torch.cuda.is_available())
 
-# In[ ]:
-
+def get_output_features_of_model(model,batch_size,dataloader):
+    for a,b in dataloader:
+        a,b=a,b
+        break
+    return (model(a)).view(batch_size,-1).shape[1]
 
 
 
