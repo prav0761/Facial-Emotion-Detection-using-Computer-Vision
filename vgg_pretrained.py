@@ -30,11 +30,16 @@ from Dataset import MyDataset
 # In[2]:
 
 
+def full_vgg():
+        vgg=torchvision.models.vgg16(pretrained=True)
+        return vgg
+
+    
 def vgg():
     vgg=torchvision.models.vgg16(pretrained=True)
     features=list(vgg.features)[:30]
     features.append(vgg.avgpool)
-    for layer in features[:23]:
+    for layer in features[:30]:
         for p in layer.parameters():
             p.requires_grad=False
     return nn.Sequential(*features)
@@ -43,11 +48,11 @@ def vgg():
 # In[ ]:
 
 
-def total_parameters(model):
+def total_trainable_parameters(model):
     total = 0
     for name, param in model.named_parameters():
         if param.requires_grad:
             total += param.numel()
     print()
-    print('Total', '\t', total)
+    print(f'Total trainable parameters of {model.__class__.__name__} is', '\t', total)
 
