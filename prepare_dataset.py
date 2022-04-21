@@ -28,18 +28,19 @@ import re
 # In[47]:
 class MyDataset(Dataset):
     def __init__(self, anno_dir,image_dir,transform=None, target_transform=None):
-        self.anno_dir = anno_dir
-        self.image_dir = image_dir
+        self.image_dir_for_len_purpose = image_dir
+        self.anno_dir1=[os.path.join(anno_dir, f) for f in os.listdir(anno_dir) if 'exp' in f]
+        self.images_dir1=[os.path.join(image_dir , f) for f in os.listdir(image_dir )]
+        self.anno_dir1.sort(key=lambda f: int(re.sub('\D', '', f)))
+        self.images_dir1.sort(key=lambda f: int(re.sub('\D', '', f)))
         self.transform = transform
         self.target_transform = target_transform
         
     def __getitem__(self, index):
-        anno=[os.path.join(self.anno_dir, f) for f in os.listdir(self.anno_dir) if 'exp' in f]
-        images=[os.path.join(self.image_dir , f) for f in os.listdir(self.image_dir )]
-        anno.sort(key=lambda f: int(re.sub('\D', '', f)))
-        images.sort(key=lambda f: int(re.sub('\D', '', f)))
-        y=torch.tensor(int(np.load(anno[index])),dtype=torch.float32)
-        x=image.imread(images[index])
+        anno_dir2=self.anno_dir1
+        images_dir2=self.images_dir1
+        y=torch.tensor(int(np.load(anno_dir2[index])),dtype=torch.float32)
+        x=image.imread(images_dir2[index])
         if self.transform:
             x = self.transform(x)
         if self.target_transform:
@@ -47,7 +48,7 @@ class MyDataset(Dataset):
         return x,y
     
     def __len__(self):
-        return len(os.listdir(self.image_dir))
+        return len(os.listdir(self.image_dir_for_len_purpose))
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
