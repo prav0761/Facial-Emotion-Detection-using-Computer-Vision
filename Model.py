@@ -47,9 +47,23 @@ class Network(nn.Module):
                           nn.Linear(1024,128),
                           nn.ReLU(inplace=True),
                           nn.Dropout(p=0.5,inplace=False),
-                          nn.Linear(128,16),
+                          nn.Linear(128,8))
+    self.input_features_for_denselayer=input_features_for_denselayer
+    
+  def forward(self,x):
+    x=self.extractor(x)
+    x=x.view(-1,self.input_features_for_denselayer)
+    x=self.RHC(x)
+    return x
+
+class new_model(nn.Module):
+  def __init__(self,feature_extractor,input_features_for_denselayer):
+    super(new_model, self).__init__()
+    self.extractor=feature_extractor
+    self.RHC=nn.Sequential(
+                          nn.Linear(input_features_for_denselayer,4096),
                           nn.ReLU(inplace=True),
-                          nn.Linear(16,8))
+                          nn.Linear(4096,8))
     self.input_features_for_denselayer=input_features_for_denselayer
     
   def forward(self,x):
