@@ -28,17 +28,22 @@ from prepare_dataset import MyDataset,subset_generator
 from utils import display_some_images,stats_of_image_and_label,MyCuda_Stats,get_output_features_of_model
 from vgg_pretrained import full_vgg,vgg_all_freezed,vgg_layer_freeze,total_trainable_parameters
 from tqdm import tqdm
+import torchvision.transforms as T
 
 
 # In[ ]:
 
-
+#T.RandomRotation(degrees=(0, 180))
+#T.RandomHorizontalFlip(p=0.5)
 class Network(nn.Module):
   def __init__(self,feature_extractor,input_features_for_denselayer):
     super(Network, self).__init__()
     self.extractor=feature_extractor
+    transform = T.Compose([T.RandomHorizontalFlip(p=0.5),
+                          T.RandomRotation(degrees=[0,90,180,270])])
     self.RHC=nn.Sequential(
-                          nn.Linear(input_features_for_denselayer,4096),
+                          transform(input_features_for_denselayer,12288),
+                          nn.Linear(12288,4096),
                           nn.ReLU(inplace=True),
                           nn.Dropout(p=0.5,inplace=False),
                           nn.Linear(4096,1024),
