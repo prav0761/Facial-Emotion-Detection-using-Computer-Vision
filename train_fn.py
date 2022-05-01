@@ -28,8 +28,8 @@ from prepare_dataset import MyDataset,subset_generator
 from utils import display_some_images,stats_of_image_and_label,MyCuda_Stats,get_output_features_of_model
 from vgg_pretrained import full_vgg,vgg_all_freezed,vgg_layer_freeze,total_trainable_parameters
 from tqdm import tqdm
+from Transform import Transform
 
-transform=Transform(input_features_for_denselayer)
 # In[21]:
 
 

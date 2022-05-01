@@ -24,7 +24,7 @@ import os
 from PIL import Image
 from torchvision.io import read_image
 from matplotlib import image
-from Dataset import MyDataset
+from prepare_dataset import MyDataset
 
 
 # In[3]:
