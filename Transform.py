@@ -29,6 +29,8 @@ from utils import display_some_images,stats_of_image_and_label,MyCuda_Stats,get_
 from vgg_pretrained import full_vgg,vgg_all_freezed,vgg_layer_freeze,total_trainable_parameters
 from tqdm import tqdm
 import torchvision.transforms as T
+import random
+
 
 
 # In[ ]:
@@ -37,8 +39,9 @@ import torchvision.transforms as T
 #T.RandomHorizontalFlip(p=0.5)
 class Transform():
   def __init__(self,input_features):
+    self.angle = random.choice([0,90,180,270])
     self.transform = T.Compose([T.RandomHorizontalFlip(p=0.5),
-                          T.RandomRotation(degrees=[0,90,180,270])])
+                          T.RandomRotation(degrees=self.angle)])
     
     #self.t_image=nn.Sequential(transform(input_features,input_features),)
     self.input_features=input_features
