@@ -39,14 +39,15 @@ import random
 #T.RandomHorizontalFlip(p=0.5)
 class Transform():
   def __init__(self,input_features):
-    self.angle = random.choice([0,90,180,270])
     self.transform = T.Compose([T.RandomHorizontalFlip(p=0.5),
-                          T.RandomRotation(degrees=self.angle)])
+                          ])
     
     #self.t_image=nn.Sequential(transform(input_features,input_features),)
     self.input_features=input_features
     
   def tran(self,x):
+    x=self.transform(x)
+    x=T.functional.rotate(img=x,angle =random.choice([0,90,180,270]))
     x=self.transform(x)
     return x
 

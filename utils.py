@@ -40,6 +40,12 @@ def display_some_images(dataloader):
         plt.imshow(image.permute(1,2,0))
     plt.show()
     
+def display_image(image,label):
+    classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
+    plt.title(classes[int(label)])
+    plt.imshow(image.permute(1,2,0))
+    plt.show()
+    
 def stats_of_image_and_label(image,label):
     print(type(image))
     print(type(label))
