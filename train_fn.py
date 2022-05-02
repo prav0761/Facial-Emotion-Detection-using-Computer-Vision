@@ -52,7 +52,7 @@ def train(dataloader,model,loss_fn,optimizer):
     print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}')  
     
     
-def train_w_transform(dataloader,model,loss_fn,optimizer,transfrom):
+def train_w_transform(dataloader,model,loss_fn,optimizer,transform):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.train()
     for batch,(X,y) in enumerate(tqdm(dataloader)):
