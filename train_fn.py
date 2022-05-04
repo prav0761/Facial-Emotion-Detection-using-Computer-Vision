@@ -28,7 +28,7 @@ from prepare_dataset import MyDataset,subset_generator
 from utils import display_some_images,stats_of_image_and_label,MyCuda_Stats,get_output_features_of_model
 from vgg_pretrained import full_vgg,vgg_all_freezed,vgg_layer_freeze,total_trainable_parameters
 from tqdm import tqdm
-
+from Transform import Transform
 
 # In[21]:
 
@@ -39,6 +39,7 @@ def train(dataloader,model,loss_fn,optimizer):
     model.train()
     for batch,(X,y) in enumerate(tqdm(dataloader)):
         y = y.type(torch.LongTensor)
+        X=transform.tran(X)
         X,y=X.to(device),y.to(device)
 
         pred=model(X)
@@ -49,6 +50,24 @@ def train(dataloader,model,loss_fn,optimizer):
         optimizer.step()
     loss=loss.item()
     print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}')  
+    
+    
+def train_w_transform(dataloader,model,loss_fn,optimizer,transform):
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model.train()
+    for batch,(X,y) in enumerate(tqdm(dataloader)):
+        y = y.type(torch.LongTensor)
+        X=transform.tran(X)
+        X,y=X.to(device),y.to(device)
+
+        pred=model(X)
+        loss=loss_fn(pred,y)
+
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    loss=loss.item()
+    print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}')
     
 def train_batch(dataloader,model,loss_fn,optimizer):
     device = "cuda" if torch.cuda.is_available() else "cpu"
