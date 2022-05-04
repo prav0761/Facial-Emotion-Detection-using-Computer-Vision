@@ -24,6 +24,7 @@ from PIL import Image
 from torchvision.io import read_image
 from matplotlib import image
 import re
+from tqdm import tqdm
 
 # In[47]:
 class MyDataset(Dataset):
@@ -48,7 +49,7 @@ class MyDataset(Dataset):
         return x,y
     
     def __len__(self):
-        return len(os.listdir(self.image_dir_for_len_purpose))
+        return len(self.anno_dir1)
     
     def upsample(self):
         classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
@@ -57,24 +58,23 @@ class MyDataset(Dataset):
         for c in classes:
             count_dict[c]=0
             idx_dict[c]=[]
-        #need to redo this for loop
-        for idx in range(len(self.anno_dir1)):
-            #for idx,(image,label) in enumerate(tqdm(train_data)):
-            #print(label)
-            label = self.anno_dir1[idx]
-            #image = self.images_dir1[idx]
+        print("Finding Class Counts...")
+        for idx in tqdm(range(len(self.anno_dir1))):
+            label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
             count_dict[classes[int(label)]]+=1
             idx_dict[classes[int(label)]].append(idx)
-        class_max = 0
+        class_max = 20000
+        #for c in classes:
+            #if count_dict[c]>class_max:
+                #class_max = count_dict[c]
         for c in classes:
-            if count_dict[c]>class_max:
-                class_max = count_dict[c]
-        for c in classes:
+            print("Balancing Class:",c)
             add_sampl = class_max-count_dict[c]
-            samples_idx = np.random.choice(idx_dict[c], add_sample, replace=True)
-            for s in samples_idx:
-                self.images_dir1.append(self.images_dir1[idx])
-                self.anno_dir1.append(self.anno_dir1[idx])
+            add_sampl = np.max([add_sampl,0])
+            samples_idx = np.random.choice(idx_dict[c], add_sampl, replace=True)
+            for s in tqdm(samples_idx):
+                self.images_dir1.append(self.images_dir1[s])
+                self.anno_dir1.append(self.anno_dir1[s])
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
