@@ -49,6 +49,32 @@ class MyDataset(Dataset):
     
     def __len__(self):
         return len(os.listdir(self.image_dir_for_len_purpose))
+    
+    def upsample(self):
+        classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
+        count_dict={}
+        idx_dict={}
+        for c in classes:
+            count_dict[c]=0
+            idx_dict[c]=[]
+        #need to redo this for loop
+        for idx in range(len(self.anno_dir1)):
+            #for idx,(image,label) in enumerate(tqdm(train_data)):
+            #print(label)
+            label = self.anno_dir1[idx]
+            #image = self.images_dir1[idx]
+            count_dict[classes[int(label)]]+=1
+            idx_dict[classes[int(label)]].append(idx)
+        class_max = 0
+        for c in classes:
+            if count_dict[c]>class_max:
+                class_max = count_dict[c]
+        for c in classes:
+            add_sampl = class_max-count_dict[c]
+            samples_idx = np.random.choice(idx_dict[c], add_sample, replace=True)
+            for s in samples_idx:
+                self.images_dir1.append(self.images_dir1[idx])
+                self.anno_dir1.append(self.anno_dir1[idx])
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
