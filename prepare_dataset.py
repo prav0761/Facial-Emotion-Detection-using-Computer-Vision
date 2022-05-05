@@ -63,7 +63,7 @@ class MyDataset(Dataset):
             label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
             count_dict[classes[int(label)]]+=1
             idx_dict[classes[int(label)]].append(idx)
-        class_max = 20000
+        class_max = 20
         #for c in classes:
             #if count_dict[c]>class_max:
                 #class_max = count_dict[c]
@@ -89,7 +89,7 @@ class MyDataset(Dataset):
             label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
             #count_dict[classes[int(label)]]+=1
             idx_dict[classes[int(label)]].append(idx)
-        class_max = 20000
+        #class_max = 20000
         #for c in classes:
             #if count_dict[c]>class_max:
                 #class_max = count_dict[c]
