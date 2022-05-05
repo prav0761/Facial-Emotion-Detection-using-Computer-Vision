@@ -76,6 +76,36 @@ class MyDataset(Dataset):
                 assert(classes[int(torch.tensor(int(np.load(self.anno_dir1[s])),dtype=torch.float32))]==c)
                 self.images_dir1.append(self.images_dir1[s])
                 self.anno_dir1.append(self.anno_dir1[s])
+                
+    def downsample(self):
+        classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
+        #count_dict={}
+        idx_dict={}
+        for c in classes:
+            #count_dict[c]=0
+            idx_dict[c]=[]
+        print("Finding Class Counts...")
+        for idx in tqdm(range(len(self.anno_dir1))):
+            label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
+            #count_dict[classes[int(label)]]+=1
+            idx_dict[classes[int(label)]].append(idx)
+        class_max = 20000
+        #for c in classes:
+            #if count_dict[c]>class_max:
+                #class_max = count_dict[c]
+        new_anno_dir = []
+        new_image_dir = []
+        for c in classes:
+            print("Balancing Class:",c)
+            #add_sampl = class_max-count_dict[c]
+            add_sampl = 5 #np.max([add_sampl,0])
+            samples_idx = np.random.choice(idx_dict[c], add_sampl, replace=True)
+            for s in tqdm(samples_idx):
+                assert(classes[int(torch.tensor(int(np.load(self.anno_dir1[s])),dtype=torch.float32))]==c)
+                new_image_dir.append(self.images_dir1[s])
+                new_anno_dir.append(self.anno_dir1[s])
+        self.anno_dir1 = new_anno_dir
+        self.image_dir1 = new_image_dir
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
