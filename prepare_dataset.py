@@ -73,6 +73,7 @@ class MyDataset(Dataset):
             add_sampl = np.max([add_sampl,0])
             samples_idx = np.random.choice(idx_dict[c], add_sampl, replace=True)
             for s in tqdm(samples_idx):
+                assert(classes[int(torch.tensor(int(np.load(self.anno_dir1[s])),dtype=torch.float32))]==c)
                 self.images_dir1.append(self.images_dir1[s])
                 self.anno_dir1.append(self.anno_dir1[s])
 
