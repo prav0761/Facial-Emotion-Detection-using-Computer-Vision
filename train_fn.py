@@ -38,14 +38,17 @@ def train(dataloader,model,loss_fn,optimizer):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.train()
     for batch,(X,y_exp,y_val,y_aro) in enumerate(tqdm(dataloader)):
-        y = y.type(torch.LongTensor)
-        X,y=X.to(device),y.to(device)
+        y_val = y_val.type(torch.LongTensor)
+        y_aro = y_aro.type(torch.LongTensor)
+        X,y_val,y_aro=X.to(device),y_val.to(device),y_aro.to(device)
 
-        pred=model(X)
-        loss=loss_fn(pred,y)
+        predVal, predAro = model(X)
+        loss1=loss_fn(pred,predVal)
+        loss2=loss_fn(pred,predAro)
 
         optimizer.zero_grad()
-        loss.backward()
+        loss1.backward()
+        loss2.backward()
         optimizer.step()
     loss=loss.item()
     print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}')  
@@ -53,15 +56,18 @@ def train(dataloader,model,loss_fn,optimizer):
 def train_batch(dataloader,model,loss_fn,optimizer):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.train()
-    for batch,(X,y) in enumerate(tqdm(dataloader)):
-        y = y.type(torch.LongTensor)
-        X,y=X.to(device),y.to(device)
+    for batch,(X,y_exp,y_val,y_aro) in enumerate(tqdm(dataloader)):
+        y_val = y_val.type(torch.LongTensor)
+        y_aro = y_aro.type(torch.LongTensor)
+        X,y_val,y_aro=X.to(device),y_val.to(device),y_aro.to(device)
 
-        pred=model(X)
-        loss=loss_fn(pred,y)
+        predVal, predAro = model(X)
+        loss1=loss_fn(predVal,y_val)
+        loss2=loss_fn(predAro,y_aro)
 
         optimizer.zero_grad()
-        loss.backward()
+        loss1.backward()
+        loss2.backward()
         optimizer.step()
         if batch%160==0:
             loss=loss.item()
@@ -72,17 +78,26 @@ def validation(dataloader,model,loss_fn):
     model.eval()
     size = len(dataloader.dataset)
     num_batches = len(dataloader)
-    test_loss,correct=0,0
+    test_loss1,test_loss2,correct1, correct2=0,0,0,0
     with torch.no_grad():
-        for batch,(X,y) in enumerate(tqdm(dataloader)):
-            y = y.type(torch.LongTensor)
-            X,y=X.to(device),y.to(device)
-            pred=model(X)
-            test_loss+=loss_fn(pred,y).item()
-            correct+=(pred.argmax(1)==y).sum().item()
-    test_loss/=num_batches
-    correct/=size
-    print(f'test error-{test_loss:>5f} \n Accuracy-{correct*100:>3f}%')
+        for batch,(X,y_exp,y_val,y_aro) in enumerate(tqdm(dataloader)):
+            y_val = y_val.type(torch.LongTensor)
+            y_aro = y_aro.type(torch.LongTensor)
+            X,y_val,y_aro=X.to(device),y_val.to(device),y_aro.to(device)
+            
+            predVal, predAro = model(X)
+            test_loss1+=loss_fn(predVal,y_val).item()
+            test_loss2+=loss_fn(predAro,y_aro).item()
+            
+            correct1+=(predVal.argmax(1)==y).sum().item()
+            correct2+=(predAro.argmax(1)==y).sum().item()
+    test_loss1/=num_batches
+    correct1/=size
+    
+    test_loss2/=num_batches
+    correct2/=size
+    print(f'test error for val-{test_loss1:>5f} \n Accuracy for val-{correct1*100:>3f}%')
+    print(f'test error for aro-{test_loss2:>5f} \n Accuracy for aro-{correct2*100:>3f}%')
 
 def validation_classes(dataloader,model,loss_fn,label):
     device = "cuda" if torch.cuda.is_available() else "cpu"

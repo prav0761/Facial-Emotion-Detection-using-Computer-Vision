@@ -15,6 +15,10 @@ class emotion_detection:
         
         return self.ems[0],0
     
-    def train(self):
+    def train(self, epochs=5):
         # need to call the NN here to get the output for val and aro and then predict
+        for epoch in range(epochs):
+            print(f'Epoch-{epoch}')
+            train_batch(train_loader,modelReg,loss_plain,optimizer)
+            validation(val_loader,modelReg,loss_plain)
         return
