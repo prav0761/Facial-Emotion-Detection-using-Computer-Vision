@@ -72,3 +72,20 @@ class new_model(nn.Module):
     x=self.RHC(x)
     return x
 
+class new_Regressor(nn.Module):
+  def __init__(self,feature_extractor,input_features_for_denselayer):
+    super(new_Regressor, self).__init__()
+    self.extractor=feature_extractor
+    self.RHC=nn.Sequential(
+                          nn.Linear(input_features_for_denselayer,4096),
+                          nn.ReLU(inplace=True),
+                          nn.Linear(4096,512),
+                          nn.ELU(inplace=True),
+                          nn.Linear(512,2))
+    self.input_features_for_denselayer=input_features_for_denselayer
+    
+  def forward(self,x):
+    x=self.extractor(x)
+    x=x.view(-1,self.input_features_for_denselayer)
+    x=self.RHC(x)
+    return x

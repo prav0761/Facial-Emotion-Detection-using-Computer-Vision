@@ -29,52 +29,35 @@ import re
 class MyDataset(Dataset):
     def __init__(self, anno_dir,image_dir,transform=None, target_transform=None):
         self.image_dir_for_len_purpose = image_dir
-        self.anno_dir1=[os.path.join(anno_dir, f) for f in os.listdir(anno_dir) if 'exp' in f]
-        self.images_dir1=[os.path.join(image_dir , f) for f in os.listdir(image_dir )]
-        self.anno_dir1.sort(key=lambda f: int(re.sub('\D', '', f)))
-        self.images_dir1.sort(key=lambda f: int(re.sub('\D', '', f)))
+        # getting from directory
+        self.exp_dir = [os.path.join(anno_dir, f) for f in os.listdir(anno_dir) if 'exp' in f]
+        self.val_dir = [os.path.join(anno_dir, f) for f in os.listdir(anno_dir) if 'val' in f]
+        self.aro_dir = [os.path.join(anno_dir, f) for f in os.listdir(anno_dir) if 'aro' in f]      
+        self.images_dir=[os.path.join(image_dir , f) for f in os.listdir(image_dir )]
+        
+        #sorting???
+        self.exp_dir.sort(key=lambda f: int(re.sub('\D', '', f)))
+        self.exp_dir.sort(key=lambda f: int(re.sub('\D', '', f)))
+        self.exp_dir.sort(key=lambda f: int(re.sub('\D', '', f)))
+        self.images_dir.sort(key=lambda f: int(re.sub('\D', '', f)))
+        
         self.transform = transform
         self.target_transform = target_transform
+        return
         
     def __getitem__(self, index):
-        anno_dir2=self.anno_dir1
-        images_dir2=self.images_dir1
-        y=torch.tensor(int(np.load(anno_dir2[index])),dtype=torch.float32)
-        x=image.imread(images_dir2[index])
+        y_exp=torch.tensor(int(np.load(self.exp_dir[index])),dtype=torch.float32)
+        y_val=torch.tensor(float(np.load(self.val_dir[index])),dtype=torch.float32)
+        y_aro=torch.tensor(float(np.load(self.aro_dir[index])),dtype=torch.float32)
+        x=image.imread(self.images_dir[index])
         if self.transform:
             x = self.transform(x)
         if self.target_transform:
-            y = self.target_transform(y)
-        return x,y
+            y_exp = self.target_transform(y_exp)
+        return x,y_exp,y_val,y_aro       
     
     def __len__(self):
         return len(os.listdir(self.image_dir_for_len_purpose))
-    
-    def upsample(self):
-        classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
-        count_dict={}
-        idx_dict={}
-        for c in classes:
-            count_dict[c]=0
-            idx_dict[c]=[]
-        #need to redo this for loop
-        for idx in range(len(self.anno_dir1)):
-            #for idx,(image,label) in enumerate(tqdm(train_data)):
-            #print(label)
-            label = self.anno_dir1[idx]
-            #image = self.images_dir1[idx]
-            count_dict[classes[int(label)]]+=1
-            idx_dict[classes[int(label)]].append(idx)
-        class_max = 0
-        for c in classes:
-            if count_dict[c]>class_max:
-                class_max = count_dict[c]
-        for c in classes:
-            add_sampl = class_max-count_dict[c]
-            samples_idx = np.random.choice(idx_dict[c], add_sample, replace=True)
-            for s in samples_idx:
-                self.images_dir1.append(self.images_dir1[idx])
-                self.anno_dir1.append(self.anno_dir1[idx])
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
