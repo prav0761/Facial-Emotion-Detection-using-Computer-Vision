@@ -45,6 +45,26 @@ def display_image(image,label):
     plt.title(classes[int(label)])
     plt.imshow(image.permute(1,2,0))
     plt.show()
+
+def display_image_transform_row(image,t_image):
+    plt.figure()
+
+    #subplot(r,c) provide the no. of rows and columns
+    f, axarr = plt.subplots(1,4,figsize=(15,15)) 
+
+    # use the created array to output your multiple images. In this case I have stacked 4 images vertically
+    axarr[0].imshow(image.permute(1,2,0))
+    axarr[0].set_title("Original")
+    axarr[1].imshow(t_image.tran(image).permute(1,2,0))
+    axarr[1].set_title("Transform 1")
+    axarr[2].imshow(t_image.tran(image).permute(1,2,0))
+    axarr[2].set_title("Transform 2")
+    axarr[3].imshow(t_image.tran(image).permute(1,2,0))
+    axarr[3].set_title("Transform 3")
+    for ax in axarr:
+        ax.set_xticks([])
+        ax.set_yticks([])
+    plt.show()
     
 def stats_of_image_and_label(image,label):
     print(type(image))

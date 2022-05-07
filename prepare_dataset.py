@@ -24,6 +24,7 @@ from PIL import Image
 from torchvision.io import read_image
 from matplotlib import image
 import re
+from tqdm import tqdm
 
 # In[47]:
 class MyDataset(Dataset):
@@ -39,8 +40,23 @@ class MyDataset(Dataset):
     def __getitem__(self, index):
         anno_dir2=self.anno_dir1
         images_dir2=self.images_dir1
+        #print("anno file")
+        #print(anno_dir2[index])
+        #print("im file")
+        #print(images_dir2[index])
+        #print("self anno")
+        #print(self.anno_dir1[index])
+        #print("self im")
+        #print(self.images_dir1[index])
+        im_set=anno_dir2[index].split("/")[2]
+        im_root1="./01_data/"
+        im_root2="/images/"
+        im_suffix=".jpg"
+        im_num=anno_dir2[index].split("\\")[1].split("_")[0]
+        fp=im_root1+im_set+im_root2+im_num+im_suffix
+        #print(fp)
         y=torch.tensor(int(np.load(anno_dir2[index])),dtype=torch.float32)
-        x=image.imread(images_dir2[index])
+        x=image.imread(fp)#images_dir2[index]
         if self.transform:
             x = self.transform(x)
         if self.target_transform:
@@ -48,7 +64,7 @@ class MyDataset(Dataset):
         return x,y
     
     def __len__(self):
-        return len(os.listdir(self.image_dir_for_len_purpose))
+        return len(self.anno_dir1)
     
     def upsample(self):
         classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
@@ -57,24 +73,57 @@ class MyDataset(Dataset):
         for c in classes:
             count_dict[c]=0
             idx_dict[c]=[]
-        #need to redo this for loop
-        for idx in range(len(self.anno_dir1)):
-            #for idx,(image,label) in enumerate(tqdm(train_data)):
-            #print(label)
-            label = self.anno_dir1[idx]
-            #image = self.images_dir1[idx]
+        print("Finding Class Counts...")
+        for idx in tqdm(range(len(self.anno_dir1))):
+            label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
             count_dict[classes[int(label)]]+=1
             idx_dict[classes[int(label)]].append(idx)
-        class_max = 0
+        class_max = 20000
+        #for c in classes:
+            #if count_dict[c]>class_max:
+                #class_max = count_dict[c]
         for c in classes:
-            if count_dict[c]>class_max:
-                class_max = count_dict[c]
-        for c in classes:
+            print("Balancing Class:",c)
             add_sampl = class_max-count_dict[c]
-            samples_idx = np.random.choice(idx_dict[c], add_sample, replace=True)
-            for s in samples_idx:
-                self.images_dir1.append(self.images_dir1[idx])
-                self.anno_dir1.append(self.anno_dir1[idx])
+            add_sampl = np.max([add_sampl,0])
+            samples_idx = np.random.choice(idx_dict[c], add_sampl, replace=True)
+            for s in tqdm(samples_idx):
+                assert(classes[int(torch.tensor(int(np.load(self.anno_dir1[s])),dtype=torch.float32))]==c)
+                self.images_dir1.append(self.images_dir1[s])
+                self.anno_dir1.append(self.anno_dir1[s])
+        #print(self.images_dir1)
+                
+    def downsample(self):
+        classes=['Neutral','Happy','Sad','Surprise','Fear','Disgust','Anger','Contempt']
+        #count_dict={}
+        idx_dict={}
+        for c in classes:
+            #count_dict[c]=0
+            idx_dict[c]=[]
+        print("Finding Class Counts...")
+        for idx in tqdm(range(len(self.anno_dir1))):
+            label = torch.tensor(int(np.load(self.anno_dir1[idx])),dtype=torch.float32)
+            #count_dict[classes[int(label)]]+=1
+            idx_dict[classes[int(label)]].append(idx)
+        #class_max = 20000
+        #for c in classes:
+            #if count_dict[c]>class_max:
+                #class_max = count_dict[c]
+        new_anno_dir = []
+        new_image_dir = []
+        for c in classes:
+            print("Balancing Class:",c)
+            #add_sampl = class_max-count_dict[c]
+            add_sampl = 5 #np.max([add_sampl,0])
+            samples_idx = np.random.choice(idx_dict[c], add_sampl, replace=True)
+            for s in tqdm(samples_idx):
+                assert(classes[int(torch.tensor(int(np.load(self.anno_dir1[s])),dtype=torch.float32))]==c)
+                #print(self.images_dir1[s],self.anno_dir1[s])
+                new_image_dir.append(self.images_dir1[s])
+                new_anno_dir.append(self.anno_dir1[s])
+        self.anno_dir1 = new_anno_dir
+        self.image_dir1 = new_image_dir
+        #print(self.images_dir1)
 
 def subset_generator(data,count):
     indices = torch.randperm(len(data))[:count]
