@@ -5,6 +5,7 @@
 
 
 import torch
+import math
 from time import time
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
@@ -24,6 +25,7 @@ from PIL import Image
 from torchvision.io import read_image
 from matplotlib import image
 import re
+from sklearn.preprocessing import OneHotEncoder
 
 # In[47]:
 class MyDataset(Dataset):
@@ -43,6 +45,15 @@ class MyDataset(Dataset):
         
         self.transform = transform
         self.target_transform = target_transform
+        
+        self.df = pd.DataFrame(columns=['val','aro','r','theta','class'])
+        for i in range(100):
+            val = float(np.load(self.val_dir[i]).astype(np.float64,copy=False))
+            aro = float(np.load(self.aro_dir[i]).astype(np.float64,copy=False))
+            self.df.loc[-1] = [val, aro, math.hypot(val, aro), math.atan2(val,aro), float(np.load(self.exp_dir[i]).astype(np.float64,copy=False))]
+            self.df.index = self.df.index + 1
+            self.df = self.df.sort_index()
+        print("This dataset is done\n")
         return
         
     def __getitem__(self, index):
@@ -55,6 +66,9 @@ class MyDataset(Dataset):
         if self.target_transform:
             y_exp = self.target_transform(y_exp)
         return x,y_exp,y_val,y_aro       
+    
+    def basis_to_exp(self):
+        return self.df
     
     def __len__(self):
         return len(os.listdir(self.image_dir_for_len_purpose))

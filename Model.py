@@ -87,7 +87,7 @@ class new_Regressor(nn.Module):
                           nn.ReLU(inplace=True),
                           nn.Linear(4096,512),
                           nn.ELU(inplace=True),
-                          nn.Linear(512,2))    
+                          nn.Linear(512,1))    
     self.input_features_for_denselayer=input_features_for_denselayer
     
   def forward(self,x):

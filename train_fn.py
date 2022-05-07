@@ -57,8 +57,8 @@ def train_batch(dataloader,model,loss_fn,optimizer):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.train()
     for batch,(X,y_exp,y_val,y_aro) in enumerate(tqdm(dataloader)):
-        y_val = y_val.type(torch.LongTensor)
-        y_aro = y_aro.type(torch.LongTensor)
+        y_val = y_val.type(torch.LongTensor).view(-1,1)
+        y_aro = y_aro.type(torch.LongTensor).view(-1,1)
         X,y_val,y_aro=X.to(device),y_val.to(device),y_aro.to(device)
 
         predVal, predAro = model(X)
@@ -69,7 +69,7 @@ def train_batch(dataloader,model,loss_fn,optimizer):
         loss1.backward()
         loss2.backward()
         optimizer.step()
-        if batch%160==0:
+        if batch%2==0:
             loss=loss.item()
             print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}') 
 
