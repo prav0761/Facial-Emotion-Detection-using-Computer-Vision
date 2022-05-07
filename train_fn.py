@@ -66,12 +66,14 @@ def train_batch(dataloader,model,loss_fn,optimizer):
         loss2=loss_fn(predAro,y_aro)
 
         optimizer.zero_grad()
-        loss1.backward()
-        loss2.backward()
+        loss1.backward(retain_graph=True)
+        loss2.backward(retain_graph=True)
         optimizer.step()
         if batch%2==0:
-            loss=loss.item()
-            print(f'loss:{loss:>5f}',f'batch:{batch}/{len(dataloader)}') 
+            loss1=loss1.item()
+            print(f'loss:{loss1:>5f}',f'batch:{batch}/{len(dataloader)}')
+            loss2=loss2.item()
+            print(f'loss:{loss2:>5f}',f'batch:{batch}/{len(dataloader)}')  
 
 def validation(dataloader,model,loss_fn):
     device = "cuda" if torch.cuda.is_available() else "cpu"

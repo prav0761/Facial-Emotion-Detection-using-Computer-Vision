@@ -47,7 +47,7 @@ class MyDataset(Dataset):
         self.target_transform = target_transform
         
         self.df = pd.DataFrame(columns=['val','aro','r','theta','class'])
-        for i in range(100):
+        for i in range(self.__len__()):
             val = float(np.load(self.val_dir[i]).astype(np.float64,copy=False))
             aro = float(np.load(self.aro_dir[i]).astype(np.float64,copy=False))
             self.df.loc[-1] = [val, aro, math.hypot(val, aro), math.atan2(val,aro), float(np.load(self.exp_dir[i]).astype(np.float64,copy=False))]
