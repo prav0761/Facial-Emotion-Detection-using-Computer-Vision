@@ -81,18 +81,18 @@ class new_Regressor(nn.Module):
                           nn.ReLU(inplace=True),
                           nn.Linear(4096,512),
                           nn.ELU(inplace=True),
-                          nn.Linear(512,1))
-    self.RHC2=nn.Sequential(
-                          nn.Linear(input_features_for_denselayer,4096),
-                          nn.ReLU(inplace=True),
-                          nn.Linear(4096,512),
-                          nn.ELU(inplace=True),
-                          nn.Linear(512,1))    
+                          nn.Linear(512,2))
+#     self.RHC2=nn.Sequential(
+#                           nn.Linear(input_features_for_denselayer,4096),
+#                           nn.ReLU(inplace=True),
+#                           nn.Linear(4096,512),
+#                           nn.ELU(inplace=True),
+#                           nn.Linear(512,1))    
     self.input_features_for_denselayer=input_features_for_denselayer
     
   def forward(self,x):
     x=self.extractor(x)
     x=x.view(-1,self.input_features_for_denselayer)
-    val=self.RHC1(x)
-    aro=self.RHC2(x)
+    val=self.RHC1(x)[0]
+    aro=self.RHC1(x)[1]
     return val, aro
