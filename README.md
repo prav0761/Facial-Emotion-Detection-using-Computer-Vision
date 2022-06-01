@@ -6,7 +6,7 @@ Machines have been able to recognize and differentiate between faces for a few y
 
 # Blog Link
 
-https://ee460j-affectnet.blogspot.com/
+https://ee460j-affectnet.blogspot.com/( Refer this if you want to see the detailed information on project , model and the datset)
 
 # Project Team
 ![image](https://user-images.githubusercontent.com/93844635/171367204-d3be20ce-f72e-4c4f-afe0-f9728a99fb77.png)
