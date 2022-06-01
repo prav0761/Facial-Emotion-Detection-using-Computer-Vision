@@ -9,3 +9,6 @@ UT AUSTIN
 4. NATHAN PAUL
 5. NIKHIL GANESH KRISH
 6. JACOB DACH
+
+Background
+Our dataset of choice for this problem is AffectNet. This dataset is attractive for image recognition due to its large scale; there are around 1 million images in the dataset, and there is 290k images that have been hand labeled with their depicted emotion. In addition, the AffectNet Dataset contains valence and arousal values which describe emotions in a continuous manner. These values are not commonly found in other facial emotion recognition datasets and allows us to create models that predict an image’s location in this continuous space rather than classify the image within the discrete space described by our eight designated emotions: Neutral, Happy, Sad, Surprise, Anger, Disgust, Fear, and Contempt.
