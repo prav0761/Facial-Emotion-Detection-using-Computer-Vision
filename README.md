@@ -9,8 +9,7 @@ Machines have been able to recognize and differentiate between faces for a few y
 https://ee460j-affectnet.blogspot.com/
 
 # Project Team
-
-UT AUSTIN
+![image](https://user-images.githubusercontent.com/93844635/171367204-d3be20ce-f72e-4c4f-afe0-f9728a99fb77.png)
 1. PRAVEEN RADHAKRISHNAN
 2. ANTHONY PHAM
 3. AVISH THAKRAL
