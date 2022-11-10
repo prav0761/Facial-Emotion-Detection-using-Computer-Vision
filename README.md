@@ -29,7 +29,7 @@ Details about the data source can be found in this paper: https://arxiv.org/pdf/
 
 The dataset we used has around 290k training images and 5k validation images which was equally distributed.
 
-Baseline Accuracy -62%
+Baseline Accuracy -62%(Authors)
 
 Our Accuracy -55%( Weighted Loss Approach)( VGG16) with Adam Optimizer and Weighted loss
 
